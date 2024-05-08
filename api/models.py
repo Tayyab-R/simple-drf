@@ -10,3 +10,12 @@ class Customer(models.Model):
 
     def __str__(self) -> str:
         return self.name
+    
+    
+class Product(models.Model):
+    """ Product bought by customer """
+    product = models.OneToOneField(Customer, on_delete=models.CASCADE) 
+    quantity = models.IntegerField()
+
+    def __str__(self) -> str:
+        return f"{self.Customer.name} - Quantity: {self.quantity}"
