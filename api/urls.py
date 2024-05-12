@@ -1,11 +1,7 @@
 from django.urls import path, include
-from rest_framework.routers import DefaultRouter
-from . import views
-
-router = DefaultRouter() # convenient and organized way to handle URL routing for views
-router.register(r'customers', views.CustomerViewSet) # a raw string representing the URL pattern for the customers resource
+from .views import hello_world, send_get_data
 
 urlpatterns = [
-    path('', include(router.urls)),
-    
+    path('', hello_world, name='hello_world'),
+    path('customers/',  send_get_data, name='send_get_data')    
 ]
