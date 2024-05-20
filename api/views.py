@@ -3,6 +3,7 @@ from django.http import JsonResponse
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework import status
+from rest_framework.renderers import JSONRenderer, TemplateHTMLRenderer
 
 from .serializers import CustomerSerializer
 from .models import Customer
@@ -31,3 +32,17 @@ def send_get_data(request):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
+        
+@api_view(['PUT'])
+def update_customer(request, pk):
+    if request.method != 'PUT':
+        return Response({'error', 'Request not allowed'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    customer = Customer.objects.get(pk=pk)
+    serializer = CustomerSerializer(customer, data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
+        
+    else:
+        return Response({'error' : 'cannot update customer'}, status=status.HTTP_400_BAD_REQUEST)
