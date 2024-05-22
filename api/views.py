@@ -4,8 +4,8 @@ from rest_framework.decorators import api_view
 from rest_framework import status
 from django.shortcuts import get_object_or_404
 
-from .serializers import CustomerSerializer
-from .models import Customer
+from .serializers import CustomerSerializer, ProductSerializer
+from .models import Customer, Product
 
 # Create your views here.
 @api_view()
