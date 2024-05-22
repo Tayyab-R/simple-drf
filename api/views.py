@@ -1,9 +1,8 @@
-from django.shortcuts import render
 from django.http import JsonResponse
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework import status
-from rest_framework.renderers import JSONRenderer, TemplateHTMLRenderer
+from django.shortcuts import get_object_or_404
 
 from .serializers import CustomerSerializer
 from .models import Customer
@@ -33,16 +32,24 @@ def send_get_data(request):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
         
-@api_view(['PUT'])
+@api_view(['PUT', 'DELETE'])
 def update_customer(request, pk):
-    if request.method != 'PUT':
-        return Response({'error', 'Request not allowed'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+    customer = get_object_or_404(Customer,  pk=pk)
+    if request.method == 'PUT':
+        serializer = CustomerSerializer(customer, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
 
-    customer = Customer.objects.get(pk=pk)
-    serializer = CustomerSerializer(customer, data=request.data)
-    if serializer.is_valid():
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_200_OK)
+    if request.method == 'DELETE':
+        if customer:
+            customer.delete()
+            return Response({'messge': 'Customer deleted successfully'}, status=status.HTTP_200_OK)
         
-    else:
-        return Response({'error' : 'cannot update customer'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'error': 'Customer does not exist'}, status=status.HTTP_400_BAD_REQUEST)
+
+    return Response({'error': 'Request method not allowed'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+        
